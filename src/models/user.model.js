@@ -1,16 +1,30 @@
 const query = require('../db/db-connection');
 const { multipleColumnSet } = require('../utils/common.utils');
 const Role = require('../utils/userRoles.utils');
+const User = require('../DAL/entities/user.entities');
+
 class UserModel {
     tableName = 'user';
+
+    //sequelize
+    findAllSequelize = async (params = {}) => {
+        /*User.findAll().then(users=>{
+            console.log('SC20', users);
+            return users;
+        });*/
+        return await User.findAll();
+    }
+
 
     find = async (params = {}) => {
         let sql = `SELECT * FROM ${this.tableName}`;
 
         if (!Object.keys(params).length) {
+            var x = await query(sql);
+            console.log('SC3', x);    
             return await query(sql);
         }
-
+        console.log('SC4', params);
         const { columnSet, values } = multipleColumnSet(params)
         sql += ` WHERE ${columnSet}`;
 

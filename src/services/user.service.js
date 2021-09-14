@@ -1,36 +1,47 @@
 const UserModel = require('../models/user.model');
-const UserService = require('../services/user.service');
 const HttpException = require('../utils/HttpException.utils');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-/*const dotenv = require('dotenv');
-dotenv.config();*/
+const dotenv = require('dotenv');
+dotenv.config();
 
 /******************************************************************************
- *                              User Controller
+ *                              User Services
  ******************************************************************************/
-class UserController {
+class UserService {
 
     findAllSequelize = async (req, res, next) => {
         console.log('SC2');
-        let userList = await UserService.findAllSequelize(req, res, next);
-        console.log('SC10', userList);
-        return res.send({
-            error: false,
-            payload: userList
+        let userList = await UserModel.findAllSequelize();
+
+        console.log('SC5', userList);
+        userList = userList.map(user => {
+            const { password, ...userWithoutPassword } = user;
+            console.log('SC6', userWithoutPassword);
+            return userWithoutPassword;
         });
+
+        console.log('SC7', userList);
+        return userList;
     };
+
 
 
     getAllUsers = async (req, res, next) => {
         console.log('SC2');
-        let userList = await UserService.getAllUsers(req, res, next);
-        console.log('SC10', userList);
-        return res.send({
-            error: false,
-            payload: userList
+        let userList = await UserModel.find();
+        if (!userList.length) {
+            throw new HttpException(404, 'Users not found');
+        }
+        console.log('SC5', userList);
+        userList = userList.map(user => {
+            const { password, ...userWithoutPassword } = user;
+            return userWithoutPassword;
         });
+
+        console.log('SC7', userList);
+        return userList;
     };
 
     getUserById = async (req, res, next) => {
@@ -154,4 +165,4 @@ class UserController {
 /******************************************************************************
  *                               Export
  ******************************************************************************/
-module.exports = new UserController;
+module.exports = new UserService;

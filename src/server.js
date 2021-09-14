@@ -4,6 +4,7 @@ const cors = require("cors");
 const HttpException = require('./utils/HttpException.utils');
 const errorMiddleware = require('./middleware/error.middleware');
 const userRouter = require('./routes/user.route');
+const sequelize = require('./db/bd');
 
 // Init express
 const app = express();
@@ -31,8 +32,16 @@ app.all('*', (req, res, next) => {
 app.use(errorMiddleware);
 
 // starting the server
-app.listen(port, () =>
-    console.log(`🚀 Server running on port ${port}!`));
+app.listen(port, function(){
+    console.log(`🚀 Server running on port ${port}!`);
+
+    /********************Autenticacion y conexion a la base de datos********************* */
+    sequelize.authenticate().then(()=>{
+        console.log("Se ha conectado correctamente");
+        }).catch(error=>{
+        console.log("Se ha producido un error", error);
+        });
+});
 
 
 module.exports = app;
